@@ -1,0 +1,17 @@
+html, body, [class*="css"] {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+h1, h2, h3 {
+    color: #2C3E50;
+    font-weight: 600;
+}
+
+.stButton>button {
+    background-color: #3498DB;
+    color: white;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+}
