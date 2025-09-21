@@ -19,8 +19,6 @@ india_union = state_gdf.unary_union  # merged India polygon
 def generate_inference(u_unit_masked, v_unit_masked, mag, mask, region_name, 
                        grid_lon, grid_lat, grid_pollutant, district_shapefile):
     """
-    Generate inference about pollutant gradients and district-level extremes.
-    
     Parameters
     ----------
     u_unit_masked : 2D array
@@ -117,7 +115,7 @@ def plot_pollution_gradient(datafile, year, month,particle, out_path, step=3, sm
         raise ValueError(f"No column {colname} in dataset")
 
     points = df[["lat", "lon"]].values
-    values = np.log10(df[colname].values + 1e-12)  # log-scale pollution
+    values = np.log10(df[colname].values + 1e-12) 
 
     # --- 2. Grid setup (bounding box) ---
     lat_min, lat_max = 29, 37
@@ -325,7 +323,6 @@ def animate_pollution_gradient_year(datafile, year, particle, out_gif, step=3, s
         m1, poll1, u1, v1 = monthly_data[idx]
         m2, poll2, u2, v2 = monthly_data[idx + 1]
 
-        # Blend fields
         poll_blend = (1 - t) * poll1 + t * poll2
         u_blend = (1 - t) * u1 + t * u2
         v_blend = (1 - t) * v1 + t * v2

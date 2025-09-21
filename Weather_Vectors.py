@@ -9,7 +9,7 @@ with open("utils/style.css") as f:
 
 st.title("🌍 Weather Vectors: From Scalars to Directional Insights")
 st.write(
-    "Turning rainfall, wind, and pollution data into **directional insights** "
+    "Turning rainfall, wind, and pollution data into *directional insights* "
     "that are easier to understand, compare, and act upon."
 )
 
@@ -18,23 +18,23 @@ st.markdown("---")
 st.markdown(
     """
     ## Why This Matters
-    Weather datasets often report **scalar values** (mm of rainfall, µg/m³ of pollution, etc.),  
-    but they miss the **direction of change** – whether it's spreading north, intensifying westward, or drifting into cities.  
+    Weather datasets often report *scalar values* (mm of rainfall, µg/m³ of pollution, etc.),  
+    but they miss the *direction of change* – whether it's spreading north, intensifying westward, or drifting into cities.  
 
-    **Direction matters.**  
-    It’s the difference between raw data and actionable early warnings for **climate resilience and disaster management**.
+    *Direction matters.*  
+    It’s the difference between raw data and actionable early warnings for *climate resilience and disaster management*.
     """
 )
 
 st.markdown(
     """
     ## Our Approach
-    - Upload data for ** Rainfall**, ** Wind**, or ** Pollution**.  
-    - We compute **gradient fields** – vectors that show where and how fast conditions are changing.  
-    - Visualize them as **maps, arrows, and animations**.  
+    - Upload data for  *Rainfall,  **Wind, or  **Pollution*.  
+    - We compute *gradient fields* – vectors that show where and how fast conditions are changing.  
+    - Visualize them as *maps, arrows, and animations*.  
 
     This adds a missing dimension to weather communication:  
-    From static numbers → to **dynamic, intuitive stories** about the atmosphere.
+    From static numbers → to *dynamic, intuitive stories* about the atmosphere.
     """
 )
 

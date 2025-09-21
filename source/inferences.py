@@ -79,7 +79,7 @@ def extract_key_frames(gif_path, num_frames=2):
 
 
 def analyze_gif(gif_path,parameter):
-    key_frames = extract_key_frames(gif_path, num_frames=30)  # more frames → better context
+    key_frames = extract_key_frames(gif_path, num_frames=30) 
 
     if parameter=="wind":
         prompt = (prompt_wind)

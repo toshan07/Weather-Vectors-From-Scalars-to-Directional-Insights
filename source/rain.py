@@ -6,9 +6,7 @@ from shapely.geometry import Point
 import datetime
 shapefile_state="source/India Shape/india_st.shp"
 shapefile_district="source/India Shape/india_ds.shp"
-'''
-********************************************************************************************************************
-'''
+
 # date->day no
 import pandas as pd
 import numpy as np
@@ -21,8 +19,6 @@ def plot_rainfall_gradient(csv_file,year, month, date,out_path):
     # --- 1. Load Data ---
     df = pd.read_csv(csv_file)
     rain_cols = [c for c in df.columns if c.startswith("Prec_")]
-
-    # Parse lat/lon from column names
     lat_lon = []
     for col in rain_cols:
         parts = col.split("_")
