@@ -1,0 +1,12 @@
+streamlit
+numpy
+pandas
+matplotlib
+geopandas
+scipy
+shapely
+python-dateutil
+python-dotenv
+google-generativeai
+Pillow
+calendar
