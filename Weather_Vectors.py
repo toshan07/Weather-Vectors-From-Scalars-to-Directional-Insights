@@ -29,7 +29,7 @@ st.markdown(
 st.markdown(
     """
     ## Our Approach
-    - Upload data for  *Rainfall,  **Wind, or  **Pollution*.  
+    - Upload data for  Rainfall,  Wind, or  Pollution.  
     - We compute *gradient fields* – vectors that show where and how fast conditions are changing.  
     - Visualize them as *maps, arrows, and animations*.  
 
