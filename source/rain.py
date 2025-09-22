@@ -4,21 +4,15 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 from shapely.geometry import Point
 import datetime
-shapefile_state="source/India Shape/india_st.shp"
-shapefile_district="source/India Shape/india_ds.shp"
 
-# date->day no
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import geopandas as gpd
-from shapely.geometry import Point
-import datetime
-
-def plot_rainfall_gradient(csv_file,year, month, date,out_path):
+def plot_rainfall_gradient(csv_file, year, month, date, out_path,
+                           shapefile_state="source/India Shape/india_st.shp",
+                           shapefile_district="source/India Shape/india_ds.shp"):
     # --- 1. Load Data ---
     df = pd.read_csv(csv_file)
     rain_cols = [c for c in df.columns if c.startswith("Prec_")]
+
+    # Parse lat/lon from column names
     lat_lon = []
     for col in rain_cols:
         parts = col.split("_")
@@ -33,7 +27,7 @@ def plot_rainfall_gradient(csv_file,year, month, date,out_path):
     day_df = df[(df["Year"] == year) & (df["Month"] == month) & (df["Date"] == date)].copy()
     if day_df.empty:
         print(f"No data found for {year}-{month:02d}-{date:02d}")
-        return
+        return []
 
     rain_values = day_df[rain_cols].iloc[0].values
 
@@ -44,24 +38,27 @@ def plot_rainfall_gradient(csv_file,year, month, date,out_path):
         j = lons.index(lon)
         rain_grid[i, j] = val
 
-    # --- 4. Gradient calculation ---
+    # --- 4. Compute gradient ---
     dlat = lats[1] - lats[0]
     dlon = lons[1] - lons[0]
     grad_lat, grad_lon = np.gradient(rain_grid, dlat, dlon)
-
     mag = np.sqrt(grad_lat**2 + grad_lon**2)
-    u_unit = np.divide(grad_lon, mag, out=np.zeros_like(grad_lon), where=mag!=0)
-    v_unit = np.divide(grad_lat, mag, out=np.zeros_like(grad_lat), where=mag!=0)
 
-    mask = np.abs(u_unit) > 1e-3
-    u_unit = np.where(mask, u_unit, np.nan)
-    v_unit = np.where(mask, v_unit, np.nan)
+    # Normalize magnitudes for arrow scaling
+    mag_norm = (mag - np.nanmin(mag)) / (np.nanmax(mag) - np.nanmin(mag) + 1e-9)
+    mag_norm = np.clip(mag_norm, 0, 1)
+    arrow_scale = 0.1 + mag_norm * (1 - 0.1)  # scaling factor
+
+    # Scale vector direction by normalized arrow length
+    u_dir = np.divide(grad_lon, mag, out=np.zeros_like(grad_lon), where=mag != 0)
+    v_dir = np.divide(grad_lat, mag, out=np.zeros_like(grad_lat), where=mag != 0)
+    u = u_dir * arrow_scale
+    v = v_dir * arrow_scale
 
     # --- 5. Load shapefiles ---
     state_gdf = gpd.read_file(shapefile_state)
     district_gdf = gpd.read_file(shapefile_district)
 
-    # --- Helper: get district & state ---
     def get_district_state(point, gdf):
         match = gdf[gdf.contains(point)]
         if not match.empty:
@@ -97,25 +94,34 @@ def plot_rainfall_gradient(csv_file,year, month, date,out_path):
     except:
         next_lat, next_lon, next_district, next_state = None, None, "No data", "No data"
 
-#**************************************************--- finding Inferences ---******************************************************************
-    output_inference=[]
-    curr_inf=f"On {year}-{month:02d}-{date:02d}, rainfall is clustered around {max_district}, {max_state} ({max_lat:.2f}, {max_lon:.2f})."
+    # --- Inferences ---
+    output_inference = []
+    month_name = datetime.date(year, month, 1).strftime('%B')
+    curr_inf = f"On {date} {month_name} {year}, rainfall is clustered around {max_district}, {max_state} ({max_lat:.2f}, {max_lon:.2f})."
     output_inference.append(curr_inf)
     if next_lat is not None:
-        upd_inf=f"On the next day ({next_day}), rainfall converges around {next_district}, {next_state} ({next_lat:.2f}, {next_lon:.2f})."
+        upd_inf = f"On the next day ({next_day.strftime('%d %B %Y')}), rainfall converges around {next_district}, {next_state} ({next_lat:.2f}, {next_lon:.2f})."
         output_inference.append(upd_inf)
-#************************************************************************************************************************************************
-    # --- 8. Plot ---
-    fig, ax = plt.subplots(figsize=(8,8))
-    cf = ax.pcolormesh(lons, lats, rain_grid, cmap="Blues", shading="auto")
-    step = 1
-    ax.quiver(lons[::step], lats[::step], u_unit[::step, ::step], v_unit[::step, ::step],
-              color="red", scale=30, width=0.004, alpha=0.9)
 
-    # Plot state boundaries
+    # --- 8. Plot ---
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    # Rainfall heatmap
+    cf = ax.pcolormesh(lons, lats, rain_grid, cmap="Blues", shading="auto")
+
+    # Quiver (colored by gradient magnitude)
+    step = 1
+    q = ax.quiver(
+        lons[::step], lats[::step],
+        u[::step, ::step], v[::step, ::step],
+        mag[::step, ::step], cmap="viridis",
+        scale=20, width=0.005, alpha=0.9
+    )
+
+    # Boundaries
     state_gdf.boundary.plot(ax=ax, color="black", linewidth=1.2)
 
-    # Mark next-day max with hollow orange circle
+    # Mark next-day max
     if next_lat is not None:
         ax.scatter(
             next_lon, next_lat,
@@ -125,9 +131,18 @@ def plot_rainfall_gradient(csv_file,year, month, date,out_path):
 
     ax.set_xlim(72.5, 81)
     ax.set_ylim(29, 37)
-    ax.set_title(f"Himalayan: Rainfall + Gradient ({year}-{month:02d}-{date:02d})", fontsize=12)
-    plt.colorbar(cf, ax=ax, shrink=0.7, label="Rainfall (mm)")
+    ax.set_title(f"Himalayan: Rainfall + Gradient ({date:02d} {month_name} {year})", fontsize=12)
+
+    # Rainfall colorbar
+    cbar = plt.colorbar(cf, ax=ax, shrink=0.7)
+    cbar.set_label("Rainfall (mm)")
+
+    # Gradient magnitude colorbar
+    cbar2 = plt.colorbar(q, ax=ax, shrink=0.7)
+    cbar2.set_label("Gradient Magnitude")
+
     ax.legend(loc="upper right")
     plt.savefig(out_path)
     plt.close()
+
     return output_inference

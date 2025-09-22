@@ -94,7 +94,7 @@ if generate_btn and wind_file:
                 out_path=out_path
             )
         st.success("✅ Visualization ready!")
-        st.image(out_path, caption=f"Wind vectors on {start_date}", use_container_width=True)
+        st.image(out_path, caption=f"Wind vectors on {start_date.strftime('%d %B %Y')}", use_container_width=True)
         
     # Multi-day/month case
     else:
@@ -137,7 +137,7 @@ if generate_btn and wind_file:
                     st.subheader(f"🌬️ {month_start.strftime('%B %Y')}")
                     st.image(
                         gif_path,
-                        caption=f"Wind animation ({month_start.strftime('%d %b')} → {month_end.strftime('%d %b')})",
+                        caption=f"Wind animation ({month_start.strftime('%d %B')} to {month_end.strftime('%d %B')})",
                         use_container_width=True
                     )
                     with st.expander("📊 Inferences"):

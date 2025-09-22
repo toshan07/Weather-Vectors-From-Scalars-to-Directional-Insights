@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation, PillowWriter
 from scipy.interpolate import interp1d
+import datetime
 
 # --- Load shapefile ---
 state_gdf = gpd.read_file("source/India Shape/india_st.shp")
@@ -122,7 +123,8 @@ def animate_wind_vectors(datafile, year, month,tot_days, step=3, scale=300, equa
         speed = np.sqrt(Uf**2 + Vf**2)
 
         Q.set_UVC(Uf[::step, ::step], Vf[::step, ::step], speed[::step, ::step])
-        title.set_text(f"Wind Vectors - {year}-{month:02d}, Day {days[day_idx]} → {days[day_idx+1]}")
+        month_name = datetime.date(year, month, 1).strftime('%B')
+        title.set_text(f"Wind Vectors - {month_name} {year}, Day {days[day_idx]} → {days[day_idx+1]}")
 
         return Q, title
 
@@ -219,7 +221,8 @@ def plot_wind_vectors_single_day(datafile, year, month, day, out_path,step=3, sc
     ax.set_xlim(lon_min, lon_max)
     ax.set_ylim(lat_min, lat_max)
 
-    ax.set_title(f"Wind Vectors + Streamlines at 10m ({year}-{month:02d}-{day:02d})", fontsize=14)
+    month_name = datetime.date(year, month, 1).strftime('%B')
+    ax.set_title(f"Wind Vectors + Streamlines at 10m ({day:02d} {month_name} {year})", fontsize=14)
     ax.set_xlabel("Longitude")
     ax.set_ylabel("Latitude")
 

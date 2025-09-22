@@ -72,7 +72,7 @@ if mode == "🌦️ Single Day":
             )
 
         st.success("✅ Visualization ready!")
-        st.image(out_path, caption=f"Rainfall gradient on {selected_date}", use_container_width=True)
+        st.image(out_path, caption=f"Rainfall gradient on {selected_date.strftime('%d %B %Y')}", use_container_width=True)
 
         st.subheader("📊 Inferences")
         for inf in inferences:
@@ -113,7 +113,7 @@ else:
             cols = st.columns(2)
             for j, (current_date, img_path, inferences) in enumerate(images_and_inferences[i:i+2]):
                 with cols[j]:
-                    st.image(img_path, caption=f"Rainfall on {current_date}", use_container_width=True)
+                    st.image(img_path, caption=f"Rainfall on {current_date.strftime('%d %B %Y')}", use_container_width=True)
                     st.markdown("**📊 Inferences:**")
                     for inf in inferences:
                         st.markdown(f"- {inf}")

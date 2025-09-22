@@ -15,23 +15,11 @@ particles = ["PM2.5", "PM10", "SO2", "PREC"]
 # Helpers
 # -------------------
 @st.cache_data
-# def save_uploaded_file(uploaded_file, particle=None):
-#     """Save uploaded file locally with pollutant-specific name if given."""
-#     if particle:
-#         fname = f"pollution_{particle.replace('.', '').replace(' ', '')}.csv"
-#     else:
-#         fname = "pollution_input.csv"
-#     with open(fname, "wb") as f:
-#         f.write(uploaded_file.read())
-#     return fname
-
 def save_uploaded_file(uploaded_file, prefix):
-    # Create a temporary file on disk
-    suffix = os.path.splitext(uploaded_file.name)[1]  # keep original extension
+    suffix = os.path.splitext(uploaded_file.name)[1] 
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, prefix=prefix+"_") as tmp:
         tmp.write(uploaded_file.getbuffer())
-        return tmp.name  # return full path
-
+        return tmp.name 
 
 @st.cache_data
 def cached_plot_month(datafile, year, month, particle, out_path):
@@ -47,6 +35,19 @@ def cached_plot_month(datafile, year, month, particle, out_path):
     )
     return out_path, inferences
 
+@st.cache_data
+def cached_animate_pollution_gradient_year(data_path,year,pollutant,out_gif):
+    inferences = animate_pollution_gradient_year(
+        datafile=data_path,
+        year=year,
+        particle=pollutant,
+        out_gif=out_gif,
+        step=8,
+        smooth=True,
+        cmap="RdYlGn_r",
+        smooth_frames=15
+    )
+    return inferences
 
 # -------------------
 # FRONTEND
@@ -215,15 +216,11 @@ elif mode == "🎞️ Yearly GIF Visualization":
         out_gif = f"plots/{pollutant}_{year}.gif"
 
         with st.spinner(f"⏳ Generating {pollutant} GIF for {year}..."):
-            inferences = animate_pollution_gradient_year(
+            inferences = cached_animate_pollution_gradient_year(
                 datafile=data_path,
                 year=year,
                 particle=pollutant,
-                out_gif=out_gif,
-                step=8,
-                smooth=True,
-                cmap="RdYlGn_r",
-                smooth_frames=15
+                out_gif=out_gif
             )
 
         st.success("✅ GIF ready!")
