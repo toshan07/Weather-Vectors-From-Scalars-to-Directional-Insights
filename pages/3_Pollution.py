@@ -217,9 +217,9 @@ elif mode == "🎞️ Yearly GIF Visualization":
 
         with st.spinner(f"⏳ Generating {pollutant} GIF for {year}..."):
             inferences = cached_animate_pollution_gradient_year(
-                datafile=data_path,
+                data_path=data_path,
                 year=year,
-                particle=pollutant,
+                pollutant=pollutant,
                 out_gif=out_gif
             )
 
